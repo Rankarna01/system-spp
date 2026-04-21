@@ -2,29 +2,30 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title') | SPP Digital</title>
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>@yield('title', 'SPP Digital')</title>
+
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
-    <script src="https://cdn.tailwindcss.com"></script>
-    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+    <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
+                    fontFamily: {
+                        sans: ['Poppins', 'sans-serif'],
+                    },
                     colors: {
                         primary: '#8B0000', // Merah Tua
-                        surface: '#FFFFFF',
-                        secondary: '#475569', // Slate 600
-                        light: '#F8FAFC'
-                    },
-                    fontFamily: {
-                        poppins: ['Poppins', 'sans-serif'],
+                        primary_hover: '#660000',
+                        secondary: '#F59E0B', // Amber/Emas sbg pendukung
+                        surface: '#FFFFFF', // Putih
+                        background: '#F3F4F6' // Abu-abu sangat terang agar surface menonjol
                     }
                 }
             }
@@ -32,59 +33,93 @@
     </script>
 
     <style>
-        body { font-family: 'Poppins', sans-serif; background-color: #F8FAFC; }
-        .loading-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255, 255, 255, 0.9);
-            display: flex; justify-content: center; align-items: center;
-            z-index: 9999;
+        /* Menghilangkan scrollbar tapi tetap bisa scroll (opsional utk UI yg lebih clean) */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        
+        /* Animasi Loading Spinner */
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #8B0000;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
         }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
-<body class="bg-light text-secondary">
+<body class="bg-background text-gray-800 font-sans antialiased overflow-x-hidden">
 
-    <div id="loading-screen" class="loading-screen">
+    <div id="loading-screen" class="fixed inset-0 z-[9999] flex items-center justify-center bg-white bg-opacity-80 backdrop-blur-sm transition-opacity duration-300">
         <div class="flex flex-col items-center">
-            <div class="animate-spin rounded-full h-12 w-12 border-t-4 border-primary"></div>
-            <p class="mt-4 text-primary font-medium">Mohon Tunggu...</p>
+            <div class="loader mb-4"></div>
+            <p class="text-primary font-semibold animate-pulse">Memuat Data...</p>
         </div>
     </div>
 
-    <div class="flex min-h-screen">
-        @if(Request::is('admin*'))
-            @include('layouts.partials.sidebar-admin')
-        @elseif(Request::is('kepsek*'))
-            @include('layouts.partials.sidebar-kepsek')
-        @endif
+    <div class="flex h-screen overflow-hidden">
+        
+       @if(auth()->check() && auth()->user()->role == 'kepsek')
+    @include('partials.sidebar_kepsek')
+@else
+    @include('partials.sidebar')
+@endif
 
-        <div class="flex-1 flex flex-col min-w-0">
-            @include('layouts.partials.header')
+        <div class="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
+            
+            @include('partials.header')
 
-            <main class="flex-1 p-4 md:p-6 pb-24 md:pb-6">
+            <main class="w-full flex-grow p-4 md:p-6 pb-24 md:pb-6">
                 @yield('content')
             </main>
+
         </div>
     </div>
 
-    @if(Request::is('siswa*'))
-        @include('layouts.partials.bottom-nav-siswa')
+    @if(auth()->check() && auth()->user()->role === 'siswa')
+        @include('partials.bottom-nav')
     @endif
 
     <script>
-        // Hide Loading Screen on Load
-        window.addEventListener('load', () => {
+        // 1. Hilangkan Loading Screen saat halaman selesai dimuat
+        window.addEventListener('load', function() {
             const loader = document.getElementById('loading-screen');
-            setTimeout(() => { loader.style.display = 'none'; }, 500);
+            loader.style.opacity = '0';
+            setTimeout(() => { loader.style.display = 'none'; }, 300);
         });
 
-        // Global SweetAlert for Flash Messages
+        // 2. Global Error / Success Handling via SweetAlert
         @if(session('success'))
-            Swal.fire({ icon: 'success', title: 'Berhasil!', text: "{{ session('success') }}", timer: 3000, showConfirmButton: false });
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: '{{ session('success') }}',
+                confirmButtonColor: '#8B0000'
+            });
         @endif
 
         @if(session('error'))
-            Swal.fire({ icon: 'error', title: 'Oops...', text: "{{ session('error') }}" });
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: '{{ session('error') }}',
+                confirmButtonColor: '#8B0000'
+            });
+        @endif
+
+        // Tangkap error validasi dari Laravel
+        @if($errors->any())
+            Swal.fire({
+                icon: 'error',
+                title: 'Validasi Gagal!',
+                html: `{!! implode('<br>', $errors->all()) !!}`,
+                confirmButtonColor: '#8B0000'
+            });
         @endif
     </script>
+    
+    @stack('scripts')
 </body>
 </html>
