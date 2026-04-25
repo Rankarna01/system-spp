@@ -77,6 +77,7 @@ Route::middleware(['auth'])->group(function () {
 
         Route::post('/payment-callback', [PaymentCallbackController::class, 'receive']); //callback langsung unutk nontifikasi bayar digunakan ketika sudah production
         Route::get('/riwayat-transaksi', [RiwayatController::class, 'index'])->name('riwayat.index');
+        Route::post('/pembayaran/cek-status/{order_id}', [PembayaranController::class, 'cekStatusMidtrans'])->name('pembayaran.cek_status');
 
         Route::prefix('laporan')->name('laporan.')->group(function () {
             Route::get('/', [LaporanController::class, 'index'])->name('index');

@@ -9,9 +9,10 @@
             <h2 class="text-xl font-bold text-gray-800">Manajemen VA & Pembayaran</h2>
             <p class="text-sm text-gray-500 mt-1">Generate Virtual Account (VA) untuk tagihan siswa.</p>
         </div>
-        </div>
+    </div>
 
-    <div class="overflow-x-auto pb-24"> <table class="w-full text-left border-collapse min-w-max">
+    <div class="overflow-x-auto pb-24"> 
+        <table class="w-full text-left border-collapse min-w-max">
             <thead class="bg-gray-50 text-gray-500 text-sm border-y border-gray-100">
                 <tr>
                     <th class="py-3 px-4 font-semibold">Siswa</th>
@@ -61,10 +62,15 @@
                     <td class="py-3 px-4 text-center">
                         @if($t->status == 'lunas')
                             <button disabled class="text-gray-400 bg-gray-100 px-3 py-1.5 rounded-md text-xs font-bold cursor-not-allowed">Selesai</button>
+                        
                         @elseif($t->status == 'menunggu' && $t->pembayaranAktif)
-                            <button onclick="alert('Fitur cek status Midtrans akan segera ditambahkan!')" class="bg-white border border-primary text-primary hover:bg-primary hover:text-white px-3 py-1.5 rounded-md text-xs font-bold transition-colors">
-                                <i class="fa-solid fa-rotate mr-1"></i> Cek Status
-                            </button>
+                            <form action="{{ route('admin.pembayaran.cek_status', $t->pembayaranAktif->order_id) }}" method="POST" class="inline-block">
+                                @csrf
+                                <button type="submit" class="bg-white border border-primary text-primary hover:bg-primary hover:text-white px-3 py-1.5 rounded-md text-xs font-bold transition-colors">
+                                    <i class="fa-solid fa-rotate mr-1"></i> Cek Status
+                                </button>
+                            </form>
+
                         @else
                             <button onclick="openModalVA({{ $t->id }}, '{{ $t->siswa->nama }}', '{{ $t->bulan }}')" class="bg-secondary hover:bg-yellow-500 text-white px-3 py-1.5 rounded-md text-xs font-bold transition-colors shadow-sm">
                                 <i class="fa-solid fa-plus mr-1"></i> {{ $t->status == 'gagal' ? 'Re-Generate VA' : 'Generate VA' }}
@@ -144,8 +150,10 @@
 
     function showLoading() {
         closeModal('modal-va');
-        document.getElementById('loading-screen').style.display = 'flex';
-        document.getElementById('loading-screen').style.opacity = '1';
+        if(document.getElementById('loading-screen')) {
+            document.getElementById('loading-screen').style.display = 'flex';
+            document.getElementById('loading-screen').style.opacity = '1';
+        }
     }
 </script>
 @endsection
