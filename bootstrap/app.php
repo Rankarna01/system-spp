@@ -18,7 +18,8 @@ return Application::configure(basePath: dirname(__DIR__))
 
 ->withMiddleware(function (Middleware $middleware) {
     $middleware->validateCsrfTokens(except: [
-        '/payment-callback', // Midtrans tidak bawa token CSRF kita
+        'payment-callback',
+        'payment-callback/*', // Tambahkan ini juga untuk jaga-jaga
     ]);
 })
     ->withExceptions(function (Exceptions $exceptions): void {
