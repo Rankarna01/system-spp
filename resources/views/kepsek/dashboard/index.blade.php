@@ -20,28 +20,28 @@
         <div class="bg-surface p-5 rounded-2xl shadow-sm border border-gray-100 relative overflow-hidden group hover:border-primary/50 transition">
             <div class="absolute -right-4 -top-4 w-16 h-16 bg-primary/5 rounded-full group-hover:scale-150 transition-transform duration-500"></div>
             <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Total Pemasukan</p>
-            <h3 class="text-xl font-black text-gray-800 relative z-10">Rp {{ number_format($totalPemasukan, 0, ',', '.') }}</h3>
+            <h3 class="text-xl font-black text-gray-800 relative z-10">Rp {{ number_format($totalPemasukan ?? 0, 0, ',', '.') }}</h3>
             <p class="text-[10px] text-green-600 font-bold mt-2"><i class="fa-solid fa-arrow-trend-up mr-1"></i>All Time Record</p>
         </div>
 
         <div class="bg-surface p-5 rounded-2xl shadow-sm border border-gray-100 relative overflow-hidden group hover:border-green-500/50 transition">
             <div class="absolute -right-4 -top-4 w-16 h-16 bg-green-50 rounded-full group-hover:scale-150 transition-transform duration-500"></div>
             <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Bulan Ini</p>
-            <h3 class="text-xl font-black text-green-600 relative z-10">Rp {{ number_format($pemasukanBulanIni, 0, ',', '.') }}</h3>
+            <h3 class="text-xl font-black text-green-600 relative z-10">Rp {{ number_format($pemasukanBulanIni ?? 0, 0, ',', '.') }}</h3>
             <p class="text-[10px] text-gray-500 mt-2">Pemasukan periode {{ date('F Y') }}</p>
         </div>
 
         <div class="bg-surface p-5 rounded-2xl shadow-sm border border-gray-100 relative overflow-hidden group hover:border-red-500/50 transition">
             <div class="absolute -right-4 -top-4 w-16 h-16 bg-red-50 rounded-full group-hover:scale-150 transition-transform duration-500"></div>
             <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Total Tunggakan</p>
-            <h3 class="text-xl font-black text-red-600 relative z-10">Rp {{ number_format($totalTunggakan, 0, ',', '.') }}</h3>
+            <h3 class="text-xl font-black text-red-600 relative z-10">Rp {{ number_format($totalTunggakan ?? 0, 0, ',', '.') }}</h3>
             <p class="text-[10px] text-gray-500 mt-2">Akumulasi tagihan belum lunas</p>
         </div>
 
         <div class="bg-surface p-5 rounded-2xl shadow-sm border border-gray-100 relative overflow-hidden group hover:border-blue-500/50 transition">
             <div class="absolute -right-4 -top-4 w-16 h-16 bg-blue-50 rounded-full group-hover:scale-150 transition-transform duration-500"></div>
             <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Kepatuhan Siswa</p>
-            <h3 class="text-xl font-black text-blue-600 relative z-10">{{ $totalSiswaLunas }} <span class="text-sm">Siswa</span></h3>
+            <h3 class="text-xl font-black text-blue-600 relative z-10">{{ $totalSiswaLunas ?? 0 }} <span class="text-sm">Siswa</span></h3>
             <p class="text-[10px] text-gray-500 mt-2">Telah lunas bulan ini</p>
         </div>
 
@@ -56,11 +56,11 @@
                     <p class="text-xs text-gray-500">Grafik pertumbuhan arus kas bulanan.</p>
                 </div>
                 <div class="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center">
-                    <i class="fa-solid fa-chart-area"></i>
+                    <i class="fa-solid fa-chart-column"></i>
                 </div>
             </div>
             <div class="relative h-72">
-                <canvas id="lineChart"></canvas>
+                <canvas id="barChart"></canvas>
             </div>
         </div>
 
@@ -97,30 +97,26 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // --- 1. SETUP LINE CHART ---
-        const lineCtx = document.getElementById('lineChart').getContext('2d');
+        // --- 1. SETUP BAR CHART ---
+        const barCtx = document.getElementById('barChart').getContext('2d');
         
-        let gradientLine = lineCtx.createLinearGradient(0, 0, 0, 300);
-        gradientLine.addColorStop(0, 'rgba(139, 0, 0, 0.5)'); // Primary Color with opacity
-        gradientLine.addColorStop(1, 'rgba(139, 0, 0, 0.0)');
+        let gradientBar = barCtx.createLinearGradient(0, 0, 0, 300);
+        gradientBar.addColorStop(0, 'rgba(139, 0, 0, 0.7)'); 
+        gradientBar.addColorStop(1, 'rgba(139, 0, 0, 0.1)');
 
-        new Chart(lineCtx, {
-            type: 'line',
+        new Chart(barCtx, {
+            type: 'bar', // Ubah jadi batang
             data: {
                 labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'],
                 datasets: [{
                     label: 'Pemasukan',
-                    data: {!! json_encode($chartLineData) !!},
+                    // Gunakan json_encode agar aman dari ParseError
+                    data: {!! json_encode($chartLineData ?? [0,0,0,0,0,0,0,0,0,0,0,0]) !!},
+                    backgroundColor: gradientBar,
                     borderColor: '#8B0000',
-                    backgroundColor: gradientLine,
-                    borderWidth: 2,
-                    fill: true,
-                    tension: 0.4,
-                    pointBackgroundColor: '#ffffff',
-                    pointBorderColor: '#8B0000',
-                    pointBorderWidth: 2,
-                    pointRadius: 4,
-                    pointHoverRadius: 6
+                    borderWidth: 1,
+                    borderRadius: 4,
+                    barPercentage: 0.6
                 }]
             },
             options: {
@@ -131,6 +127,7 @@
                     tooltip: {
                         callbacks: {
                             label: function(context) {
+                                // Tetap tampilkan nominal Rupiah saat di-hover (misal: Rp 1.500.000)
                                 return ' Rp ' + context.parsed.y.toLocaleString('id-ID');
                             }
                         }
@@ -139,9 +136,10 @@
                 scales: {
                     y: {
                         beginAtZero: true,
+                        suggestedMax: 1000000, // Menjaga grid tetap proporsional meski data kosong
                         grid: { borderDash: [4, 4], color: '#f3f4f6' },
                         ticks: {
-                            callback: function(value) { return 'Rp ' + (value/1000000) + 'M'; }
+                            display: false // INI YANG MENGHILANGKAN ANGKA JELEK DI KIRI GRAFIK
                         }
                     },
                     x: {
@@ -159,7 +157,8 @@
             data: {
                 labels: ['Lunas', 'Menunggu', 'Belum Bayar'],
                 datasets: [{
-                   data: {!! json_encode($chartDoughnutData) !!},
+                    // Gunakan json_encode juga di sini
+                    data: {!! json_encode($chartDoughnutData ?? [0,0,0]) !!},
                     backgroundColor: ['#22c55e', '#facc15', '#ef4444'], // Green, Yellow, Red
                     borderWidth: 0,
                     hoverOffset: 4
@@ -168,7 +167,7 @@
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                cutout: '75%', // Membuat lubang tengah lebih besar
+                cutout: '75%', 
                 plugins: {
                     legend: { display: false } 
                 }

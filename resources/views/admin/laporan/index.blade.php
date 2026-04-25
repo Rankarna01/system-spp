@@ -129,23 +129,24 @@
     // 2. Render Chart Pemasukan
     document.addEventListener('DOMContentLoaded', function() {
         const ctx = document.getElementById('laporanChart').getContext('2d');
-        const dataPemasukan = @json($chartPemasukan); // Mengambil array data dari Controller
         
         let gradient = ctx.createLinearGradient(0, 0, 0, 300);
         gradient.addColorStop(0, 'rgba(139, 0, 0, 0.6)');   // Primary color with opacity
         gradient.addColorStop(1, 'rgba(139, 0, 0, 0.05)');
 
         new Chart(ctx, {
-            type: 'bar', // Kita pakai Bar Chart agar beda dengan dashboard
+            type: 'bar', // Bar Chart
             data: {
                 labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'],
                 datasets: [{
-                    label: 'Total Pemasukan (Rp)',
-                    data: dataPemasukan,
+                    label: 'Total Pemasukan',
+                    // Gunakan json_encode untuk menghindari ParseError
+                    data: {!! json_encode($chartPemasukan ?? [0,0,0,0,0,0,0,0,0,0,0,0]) !!},
                     backgroundColor: gradient,
                     borderColor: '#8B0000',
                     borderWidth: 1,
                     borderRadius: 4,
+                    barPercentage: 0.6 // Batang lebih ramping
                 }]
             },
             options: {
@@ -156,12 +157,8 @@
                     tooltip: {
                         callbacks: {
                             label: function(context) {
-                                let label = context.dataset.label || '';
-                                if (label) { label += ': '; }
-                                if (context.parsed.y !== null) {
-                                    label += new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(context.parsed.y);
-                                }
-                                return label;
+                                // Tampilkan angka murni dengan format ribuan (misal: 1.500.000) tanpa Rp
+                                return ' ' + context.parsed.y.toLocaleString('id-ID');
                             }
                         }
                     }
@@ -169,10 +166,16 @@
                 scales: {
                     y: {
                         beginAtZero: true,
+                        suggestedMax: 1000000, // Minimal Y-axis sampai 1 juta jika data kosong
                         grid: { borderDash: [4, 4], color: '#E5E7EB' },
                         ticks: {
+                            precision: 0, // Mencegah angka desimal
                             callback: function(value) {
-                                return 'Rp ' + (value/1000000) + 'M'; // Mempersingkat angka panjang
+                                // Tampilkan K (ribu) atau M (juta) tanpa Rp
+                                if (value === 0) return '0';
+                                if (value >= 1000000) return (value / 1000000) + 'M';
+                                if (value >= 1000) return (value / 1000) + 'K';
+                                return value;
                             }
                         }
                     },
