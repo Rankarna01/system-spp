@@ -17,6 +17,7 @@ use App\Http\Controllers\Admin\RiwayatController;
 use App\Http\Controllers\Admin\LaporanController;
 use App\Http\Controllers\Admin\NotifikasiController;
 use App\Http\Controllers\Admin\AkunSiswaController;
+use App\Http\Controllers\Admin\PengaturanController;
 
 
 // Import Role Siswa PWA Mobile
@@ -29,6 +30,7 @@ use App\Http\Controllers\Siswa\ProfileController as SiswaProfile;
 //Import Role kepsek 
 use App\Http\Controllers\Kepsek\DashboardController as KepsekDashboard;
 use App\Http\Controllers\Kepsek\LaporanController as KepsekLaporan;
+
 
 // 1. Pintu Masuk Utama (Pengecekan Otomatis)
 Route::get('/', function () {
@@ -89,12 +91,17 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/', [NotifikasiController::class, 'index'])->name('index');
             Route::post('/blast', [NotifikasiController::class, 'blast'])->name('blast');
         });
+
+        Route::get('/pengaturan', [PengaturanController::class, 'index'])->name('pengaturan.index');
+    Route::post('/pengaturan/update', [PengaturanController::class, 'update'])->name('pengaturan.update');
     });
 
     // --- AREA KEPALA SEKOLAH ---
    Route::middleware(['auth', 'role:kepsek'])->prefix('kepsek')->name('kepsek.')->group(function () {
     Route::get('/dashboard', [KepsekDashboard::class, 'index'])->name('dashboard');
     Route::get('/laporan', [KepsekLaporan::class, 'index'])->name('laporan.index');
+    // Tambahkan rute cetak ini:
+    Route::get('/laporan/cetak', [KepsekLaporan::class, 'cetak'])->name('laporan.cetak');
     // ...
 });
 

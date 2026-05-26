@@ -66,7 +66,7 @@
             <h3 class="text-lg font-bold text-gray-800 mb-4">Cetak / Export Data</h3>
             <p class="text-sm text-gray-500 mb-6">Pilih jenis laporan dan rentang waktu untuk mengunduh data.</p>
 
-            <form id="form-export" action="{{ route('admin.laporan.export.pdf') }}" method="POST" class="flex-grow flex flex-col space-y-4">
+            <form method="POST" class="flex-grow flex flex-col space-y-4">
                 @csrf
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Jenis Laporan</label>
@@ -99,10 +99,10 @@
                 </div>
 
                 <div class="mt-auto pt-6 flex gap-3">
-                    <button type="submit" onclick="document.getElementById('form-export').action='{{ route('admin.laporan.export.pdf') }}'" class="w-full bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-bold transition-colors shadow-sm flex items-center justify-center gap-2">
+                    <button type="submit" formaction="{{ route('admin.laporan.export.pdf') }}" formtarget="_blank" class="w-full bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-bold transition-colors shadow-sm flex items-center justify-center gap-2">
                         <i class="fa-solid fa-file-pdf"></i> PDF
                     </button>
-                    <button type="submit" onclick="document.getElementById('form-export').action='{{ route('admin.laporan.export.excel') }}'" class="w-full bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-bold transition-colors shadow-sm flex items-center justify-center gap-2">
+                    <button type="submit" formaction="{{ route('admin.laporan.export.excel') }}" formtarget="_self" class="w-full bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-bold transition-colors shadow-sm flex items-center justify-center gap-2">
                         <i class="fa-solid fa-file-excel"></i> Excel
                     </button>
                 </div>
@@ -131,22 +131,21 @@
         const ctx = document.getElementById('laporanChart').getContext('2d');
         
         let gradient = ctx.createLinearGradient(0, 0, 0, 300);
-        gradient.addColorStop(0, 'rgba(139, 0, 0, 0.6)');   // Primary color with opacity
+        gradient.addColorStop(0, 'rgba(139, 0, 0, 0.6)');   
         gradient.addColorStop(1, 'rgba(139, 0, 0, 0.05)');
 
         new Chart(ctx, {
-            type: 'bar', // Bar Chart
+            type: 'bar',
             data: {
                 labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'],
                 datasets: [{
-                    label: 'Total Pemasukan',
-                    // Gunakan json_encode untuk menghindari ParseError
+                    label: 'Pemasukan',
                     data: {!! json_encode($chartPemasukan ?? [0,0,0,0,0,0,0,0,0,0,0,0]) !!},
                     backgroundColor: gradient,
                     borderColor: '#8B0000',
                     borderWidth: 1,
                     borderRadius: 4,
-                    barPercentage: 0.6 // Batang lebih ramping
+                    barPercentage: 0.6
                 }]
             },
             options: {
@@ -157,7 +156,6 @@
                     tooltip: {
                         callbacks: {
                             label: function(context) {
-                                // Tampilkan angka murni dengan format ribuan (misal: 1.500.000) tanpa Rp
                                 return ' ' + context.parsed.y.toLocaleString('id-ID');
                             }
                         }
@@ -166,17 +164,10 @@
                 scales: {
                     y: {
                         beginAtZero: true,
-                        suggestedMax: 1000000, // Minimal Y-axis sampai 1 juta jika data kosong
+                        suggestedMax: 1000000, 
                         grid: { borderDash: [4, 4], color: '#E5E7EB' },
                         ticks: {
-                            precision: 0, // Mencegah angka desimal
-                            callback: function(value) {
-                                // Tampilkan K (ribu) atau M (juta) tanpa Rp
-                                if (value === 0) return '0';
-                                if (value >= 1000000) return (value / 1000000) + 'M';
-                                if (value >= 1000) return (value / 1000) + 'K';
-                                return value;
-                            }
+                            display: false
                         }
                     },
                     x: {

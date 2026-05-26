@@ -4,12 +4,18 @@
 
     <div class="flex items-center justify-between px-6 py-6 border-b border-white/10">
         <a href="{{ route('kepsek.dashboard') }}" class="flex items-center gap-3 group">
-            <div class="bg-white/10 p-2 rounded-xl group-hover:scale-110 transition-transform duration-300">
-                <i class="fa-solid fa-graduation-cap text-2xl text-white"></i>
+            
+            <div class="bg-white/10 p-2 rounded-xl group-hover:scale-110 transition-transform duration-300 flex items-center justify-center shrink-0 text-white">
+                @if(isset($gSetting) && $gSetting->logo)
+                    <img src="{{ asset('storage/' . $gSetting->logo) }}" class="h-6 w-6 object-contain rounded">
+                @else
+                    <i class="fa-solid fa-graduation-cap text-2xl text-white"></i>
+                @endif
             </div>
-            <div class="flex flex-col">
-                <span class="text-xl font-bold tracking-tight text-white">SPP Digital</span>
-                <span class="text-[10px] text-white/60 uppercase tracking-[2px] -mt-1">Executive System</span>
+
+            <div class="flex flex-col overflow-hidden">
+                <span class="text-xl font-bold tracking-tight text-white truncate">{{ $gSetting->nama_sistem ?? 'SPP Digital' }}</span>
+                <span class="text-[10px] text-white/60 uppercase tracking-[2px] -mt-1 truncate">{{ $gSetting->slogan_sistem ?? 'Executive System' }}</span>
             </div>
         </a>
 

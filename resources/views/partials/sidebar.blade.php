@@ -2,21 +2,27 @@
 
 <aside id="sidebar" class="fixed left-0 top-0 z-50 flex h-screen w-72 flex-col bg-primary text-white transition-all duration-300 ease-in-out md:static md:translate-x-0 -translate-x-full shadow-2xl">
 
-    <div class="flex items-center justify-between px-6 py-6 border-b border-white/10">
-        <a href="{{ auth()->user()->role == 'admin' ? route('admin.dashboard') : route('kepsek.dashboard') }}" class="flex items-center gap-3 group">
-            <div class="bg-white/10 p-2 rounded-xl group-hover:scale-110 transition-transform duration-300">
-                <i class="fa-solid fa-graduation-cap text-2xl text-white"></i>
-            </div>
-            <div class="flex flex-col">
-                <span class="text-xl font-bold tracking-tight text-white">SPP Digital</span>
-                <span class="text-[10px] text-white/60 uppercase tracking-[2px] -mt-1">Management System</span>
-            </div>
-        </a>
+   <div class="flex items-center justify-between px-6 py-6 border-b border-white/10">
+    <a href="{{ auth()->user()->role == 'admin' ? route('admin.dashboard') : route('kepsek.dashboard') }}" class="flex items-center gap-3 group">
+        
+        <div class="bg-white/10 p-2 rounded-xl group-hover:scale-110 transition-transform duration-300 flex items-center justify-center shrink-0 text-white">
+            @if(isset($gSetting) && $gSetting->logo)
+                <img src="{{ asset('storage/' . $gSetting->logo) }}" class="h-6 w-6 object-contain rounded">
+            @else
+                <i class="fa-solid fa-graduation-cap text-2xl"></i>
+            @endif
+        </div>
+        
+        <div class="flex flex-col overflow-hidden">
+            <span class="text-xl font-bold tracking-tight text-white truncate">{{ $gSetting->nama_sistem ?? 'SPP Digital' }}</span>
+            <span class="text-[10px] text-white/60 uppercase tracking-[2px] -mt-1 truncate">{{ $gSetting->slogan_sistem ?? 'Management System' }}</span>
+        </div>
+    </a>
 
-        <button onclick="toggleSidebar()" class="md:hidden text-white/70 hover:text-white p-1">
-            <i class="fa-solid fa-arrow-left-long text-xl"></i>
-        </button>
-    </div>
+    <button onclick="toggleSidebar()" class="md:hidden text-white/70 hover:text-white p-1">
+        <i class="fa-solid fa-arrow-left-long text-xl"></i>
+    </button>
+</div>
 
     <div class="flex-1 overflow-y-auto custom-scrollbar px-4 py-6">
         <nav class="space-y-8">
@@ -100,6 +106,12 @@
                                 <span class="text-sm">Pengaturan</span>
                             </a>
                         </li>
+                        <li>
+    <a href="{{ route('admin.pengaturan.index') }}" class="group flex items-center gap-3 rounded-xl px-4 py-3 transition-all duration-200 {{ request()->routeIs('admin.pengaturan.*') ? 'bg-white text-primary font-bold shadow-lg shadow-black/10' : 'text-white/80 hover:bg-white/10 hover:text-white' }}">
+        <i class="fa-solid fa-gear text-lg"></i>
+        <span class="text-sm">Pengaturan Sistem</span>
+    </a>
+</li>
                     </ul>
                 </div>
             @endif
