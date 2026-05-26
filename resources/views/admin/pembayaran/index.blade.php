@@ -11,7 +11,7 @@
         </div>
     </div>
 
-    <div class="overflow-x-auto pb-24"> 
+    <div class="overflow-x-auto pb-4"> 
         <table class="w-full text-left border-collapse min-w-max">
             <thead class="bg-gray-50 text-gray-500 text-sm border-y border-gray-100">
                 <tr>
@@ -83,6 +83,10 @@
                 @endforelse
             </tbody>
         </table>
+    </div>
+    
+    <div class="pt-4 border-t border-gray-100">
+        {{ $tagihan->links('pagination::tailwind') }}
     </div>
 </div>
 

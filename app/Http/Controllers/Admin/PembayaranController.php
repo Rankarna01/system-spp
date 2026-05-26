@@ -21,9 +21,10 @@ class PembayaranController extends Controller
 
     public function index()
     {
+        // MENGUBAH get() MENJADI paginate(10)
         $tagihan = Tagihan::with(['siswa.kelas', 'sppMaster', 'pembayaranAktif'])
                     ->latest()
-                    ->get();
+                    ->paginate(10);
                     
         return view('admin.pembayaran.index', compact('tagihan'));
     }
@@ -104,9 +105,6 @@ class PembayaranController extends Controller
         }
     }
 
-    // ==========================================
-    // FUNGSI BARU: CEK STATUS MANUAL KE MIDTRANS
-    // ==========================================
     // ==========================================
     // FUNGSI BARU: CEK STATUS MANUAL KE MIDTRANS
     // ==========================================
