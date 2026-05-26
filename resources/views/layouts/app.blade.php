@@ -61,15 +61,19 @@
 
     <div class="flex h-screen overflow-hidden">
         
-       @if(auth()->check() && auth()->user()->role == 'kepsek')
-    @include('partials.sidebar_kepsek')
-@else
-    @include('partials.sidebar')
-@endif
+       @if(auth()->check() && auth()->user()->role != 'siswa')
+           @if(auth()->user()->role == 'kepsek')
+               @include('partials.sidebar_kepsek')
+           @else
+               @include('partials.sidebar')
+           @endif
+       @endif
 
         <div class="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
             
-            @include('partials.header')
+            @if(auth()->check() && auth()->user()->role != 'siswa')
+                @include('partials.header')
+            @endif
 
             <main class="w-full flex-grow p-4 md:p-6 pb-24 md:pb-6">
                 @yield('content')

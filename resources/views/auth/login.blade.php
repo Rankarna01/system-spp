@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - SPP Digital</title>
+    <title>Login - {{ $gSetting->nama_sistem ?? 'SPP Digital' }}</title>
+    
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.12.2/lottie.min.js"></script>
-    
     <script src="https://cdn.tailwindcss.com"></script>
+    
     <script>
         tailwind.config = {
             theme: {
@@ -28,8 +28,11 @@
     <div class="hidden lg:flex lg:w-1/2 flex-col items-center justify-center p-12 relative overflow-hidden">
         
         <div class="text-center mb-8 z-10">
-            <h1 class="text-4xl font-bold text-gray-800 mb-4">Sistem Manajemen SPP</h1>
-            <p class="text-gray-600 font-medium">Kelola administrasi dan pembayaran sekolah<br>dengan lebih mudah, cepat, dan transparan.</p>
+            <h1 class="text-4xl font-bold text-gray-800 mb-4">{{ $gSetting->nama_sistem ?? 'Sistem Manajemen SPP' }}</h1>
+            <p class="text-gray-600 font-medium">
+                {{ $gSetting->slogan_sistem ?? 'Kelola administrasi dan pembayaran sekolah' }}<br>
+                dengan lebih mudah, cepat, dan transparan.
+            </p>
         </div>
 
         <div id="lottie-container" class="w-full max-w-lg z-10"></div>
@@ -42,10 +45,15 @@
         
         <div class="w-full max-w-md">
             <div class="text-center mb-10">
-                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-5 shadow-inner">
-                    <i class="fa-solid fa-wallet text-3xl text-primary"></i>
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-5 shadow-inner overflow-hidden">
+                    @if(isset($gSetting) && $gSetting->logo)
+                        <img src="{{ asset('storage/' . $gSetting->logo) }}" alt="Logo" class="w-10 h-10 object-contain">
+                    @else
+                        <i class="fa-solid fa-wallet text-3xl text-primary"></i>
+                    @endif
                 </div>
-                <h2 class="text-3xl font-bold text-gray-800">SPP Digital</h2>
+                
+                <h2 class="text-3xl font-bold text-gray-800">{{ $gSetting->nama_sistem ?? 'SPP Digital' }}</h2>
                 <p class="text-sm text-gray-500 mt-2">Silakan masuk ke akun Anda untuk melanjutkan</p>
             </div>
 
@@ -76,7 +84,6 @@
                     </div>
                 </div>
 
-
                 <button type="submit" 
                     class="w-full flex justify-center py-3.5 px-4 border border-transparent rounded-xl shadow-md text-sm font-bold text-white bg-primary hover:bg-[#660000] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all hover:shadow-lg active:scale-[0.98]">
                     Masuk Sekarang <i class="fa-solid fa-arrow-right ml-2 mt-0.5"></i>
@@ -89,11 +96,10 @@
         // 1. Script untuk Menjalankan Animasi Lottie (JSON)
         document.addEventListener('DOMContentLoaded', function() {
             lottie.loadAnimation({
-                container: document.getElementById('lottie-container'), // ID div penampung
+                container: document.getElementById('lottie-container'), 
                 renderer: 'svg',
                 loop: true,
                 autoplay: true,
-                // Pastikan file JSON ada di folder public/
                 path: '{{ asset("The guy with the cat at the computer.json") }}' 
             });
         });
