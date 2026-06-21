@@ -60,10 +60,17 @@
                             <td class="py-3 px-4 font-bold text-gray-800">{{ $namaBulan[$m->bulan] }}</td>
                             <td class="py-3 px-4 font-medium text-primary">Rp {{ number_format($m->nominal, 0, ',', '.') }}</td>
                             <td class="py-3 px-4 text-gray-600">{{ \Carbon\Carbon::parse($m->tanggal_jatuh_tempo)->translatedFormat('d F Y') }}</td>
-                            <td class="py-3 px-4 text-center">
+                            <td class="py-3 px-4 text-center flex items-center justify-center gap-2">
                                 <button onclick="openModalGenerate({{ $m->id }}, '{{ $namaBulan[$m->bulan] }}')" class="bg-secondary hover:bg-yellow-500 text-white px-3 py-1.5 rounded-md text-xs font-bold transition-colors">
                                     <i class="fa-solid fa-bolt mr-1"></i> Generate
                                 </button>
+                                <form action="{{ route('admin.tagihan.master.destroy', $m->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus master tagihan bulan {{ $namaBulan[$m->bulan] }} ini? (Semua tagihan siswa yang terkait juga akan ikut terhapus)')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-md text-xs font-bold transition-colors">
+                                        <i class="fa-solid fa-trash mr-1"></i> Hapus
+                                    </button>
+                                </form>
                             </td>
                         </tr>
                         @empty

@@ -70,6 +70,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/', [TagihanController::class, 'index'])->name('index');
             Route::post('/master', [TagihanController::class, 'storeMaster'])->name('master.store');
             Route::post('/generate', [TagihanController::class, 'generate'])->name('generate');
+            Route::delete('/master/{id}', [TagihanController::class, 'destroyMaster'])->name('master.destroy');
         });
 
         Route::prefix('pembayaran')->name('pembayaran.')->group(function () {
@@ -106,7 +107,7 @@ Route::middleware(['auth'])->group(function () {
 });
 
     // --- AREA SISWA ---
-        Route::middleware(['auth', 'role:siswa'])->prefix('siswa')->name('siswa.')->group(function () {
+Route::middleware(['auth', 'role:siswa'])->prefix('siswa')->name('siswa.')->group(function () {
     Route::get('/dashboard', [SiswaDashboard::class, 'index'])->name('dashboard');
     Route::get('/tagihan', [SiswaTagihan::class, 'index'])->name('tagihan.index');
     Route::get('/riwayat', [SiswaRiwayat::class, 'index'])->name('riwayat.index');

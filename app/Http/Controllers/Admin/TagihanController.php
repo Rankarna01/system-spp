@@ -118,4 +118,20 @@ class TagihanController extends Controller
             return back()->with('error', 'Terjadi kesalahan sistem saat generate tagihan: ' . $e->getMessage());
         }
     }
+
+    public function destroyMaster($id) {
+        try {
+            $master = SppMaster::findOrFail($id);
+            
+            // Hapus semua tagihan yang terkait dengan master ini terlebih dahulu
+            Tagihan::where('spp_master_id', $master->id)->delete();
+            
+            // Hapus master SPP
+            $master->delete();
+            
+            return back()->with('success', 'Master SPP beserta tagihan terkait berhasil dihapus.');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Terjadi kesalahan saat menghapus master SPP: ' . $e->getMessage());
+        }
+    }
 }
