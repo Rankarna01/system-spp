@@ -21,10 +21,30 @@ class PembayaranController extends Controller
 
     public function index()
     {
-        // MENGUBAH get() MENJADI paginate(10)
         $tagihan = Tagihan::with(['siswa.kelas', 'sppMaster', 'pembayaranAktif'])
                     ->latest()
                     ->paginate(10);
+
+        // Auto-sync status dengan Midtrans untuk tagihan yang masih 'menunggu' (Solusi Localhost)
+        foreach ($tagihan as $t) {
+            if ($t->status === 'menunggu' && $t->pembayaranAktif) {
+                try {
+                    $statusData = \Midtrans\Transaction::status($t->pembayaranAktif->order_id);
+                    $statusArray = (array) $statusData;
+                    $transactionStatus = $statusArray['transaction_status'] ?? '';
+
+                    if ($transactionStatus === 'capture' || $transactionStatus === 'settlement') {
+                        $t->pembayaranAktif->update(['status' => 'lunas']);
+                        $t->update(['status' => 'lunas']);
+                    } elseif ($transactionStatus === 'deny' || $transactionStatus === 'expire' || $transactionStatus === 'cancel') {
+                        $t->pembayaranAktif->update(['status' => 'gagal']);
+                        $t->update(['status' => 'belum_bayar']);
+                    }
+                } catch (\Exception $e) {
+                    // Abaikan error agar halaman tetap bisa diakses
+                }
+            }
+        }
                     
         return view('admin.pembayaran.index', compact('tagihan'));
     }
