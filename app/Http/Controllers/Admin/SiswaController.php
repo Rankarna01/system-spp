@@ -25,7 +25,8 @@ class SiswaController extends Controller
             'nisn' => 'required|unique:siswa', 
             'nama' => 'required', 
             'kelas_id' => 'required', 
-            'tahun_ajaran_id' => 'required'
+            'tahun_ajaran_id' => 'required',
+            'email_orang_tua' => 'required|email'
         ]);
         Siswa::create($request->all());
         return back()->with('success', 'Siswa berhasil ditambahkan!');
@@ -36,7 +37,8 @@ class SiswaController extends Controller
             'nisn' => 'required|unique:siswa,nisn,'.$id, 
             'nama' => 'required',
             'kelas_id' => 'required',
-            'tahun_ajaran_id' => 'required'
+            'tahun_ajaran_id' => 'required',
+            'email_orang_tua' => 'required|email'
         ]);
         Siswa::findOrFail($id)->update($request->all());
         return back()->with('success', 'Siswa berhasil diupdate!');

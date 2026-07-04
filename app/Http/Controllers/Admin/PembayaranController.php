@@ -36,6 +36,15 @@ class PembayaranController extends Controller
                     if ($transactionStatus === 'capture' || $transactionStatus === 'settlement') {
                         $t->pembayaranAktif->update(['status' => 'lunas']);
                         $t->update(['status' => 'lunas']);
+
+                        // Kirim email kuitansi
+                        if (!empty($t->siswa->email_orang_tua)) {
+                            try {
+                                \Illuminate\Support\Facades\Mail::to($t->siswa->email_orang_tua)->send(new \App\Mail\PaymentSuccessMail($t, $t->pembayaranAktif));
+                            } catch (\Exception $e) {
+                                // Abaikan error email
+                            }
+                        }
                     } elseif ($transactionStatus === 'deny' || $transactionStatus === 'expire' || $transactionStatus === 'cancel') {
                         $t->pembayaranAktif->update(['status' => 'gagal']);
                         $t->update(['status' => 'belum_bayar']);
@@ -57,6 +66,10 @@ class PembayaranController extends Controller
 
         if ($tagihan->status === 'lunas') {
             return back()->with('error', 'Tagihan ini sudah lunas!');
+        }
+
+        if (empty($tagihan->siswa->email_orang_tua)) {
+            return back()->with('error', 'Gagal Generate VA! Siswa ini belum memiliki Email Orang Tua. Silakan lengkapi data email di menu Manajemen Siswa terlebih dahulu agar notifikasi dapat dikirim.');
         }
 
         $vaAktif = Pembayaran::where('tagihan_id', $tagihan->id)->where('status', 'menunggu')->first();
@@ -104,7 +117,7 @@ class PembayaranController extends Controller
                 throw new \Exception("Gagal mendapatkan Virtual Account dari bank.");
             }
 
-            Pembayaran::create([
+            $pembayaran = Pembayaran::create([
                 'tagihan_id' => $tagihan->id,
                 'order_id' => $orderId,
                 'gross_amount' => $tagihan->nominal,
@@ -117,6 +130,16 @@ class PembayaranController extends Controller
             $tagihan->update(['status' => 'menunggu']);
 
             DB::commit();
+
+            // Send Email to Parent if email exists
+            if (!empty($tagihan->siswa->email_orang_tua)) {
+                try {
+                    \Illuminate\Support\Facades\Mail::to($tagihan->siswa->email_orang_tua)->send(new \App\Mail\VAGeneratedMail($tagihan, $pembayaran));
+                } catch (\Exception $e) {
+                    \Illuminate\Support\Facades\Log::error('Gagal mengirim email VA: ' . $e->getMessage());
+                }
+            }
+
             return back()->with('success', 'Virtual Account ' . strtoupper($request->bank) . ' berhasil digenerate!');
 
         } catch (\Exception $e) {

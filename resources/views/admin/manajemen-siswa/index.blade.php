@@ -24,6 +24,7 @@
                     <th class="py-3 px-4 font-semibold">Kelas</th>
                     <th class="py-3 px-4 font-semibold">Jurusan</th>
                     <th class="py-3 px-4 font-semibold">Tahun Ajaran</th>
+                    <th class="py-3 px-4 font-semibold">Email Orang Tua</th>
                     <th class="py-3 px-4 font-semibold text-center w-32">Aksi</th>
                 </tr>
             </thead>
@@ -40,8 +41,9 @@
                         </span>
                     </td>
                     <td class="py-3 px-4 text-gray-600">{{ $item->tahunAjaran->tahun ?? '-' }}</td>
+                    <td class="py-3 px-4 text-gray-600">{{ $item->email_orang_tua ?? '-' }}</td>
                     <td class="py-3 px-4 flex justify-center gap-2">
-                        <button onclick="openModalEdit({{ $item->id }}, '{{ $item->nisn }}', '{{ $item->nama }}', '{{ $item->kelas_id }}', '{{ $item->tahun_ajaran_id }}')" class="text-blue-600 hover:text-blue-800 bg-blue-50 p-2 rounded-md transition-colors" title="Edit Data">
+                        <button onclick="openModalEdit({{ $item->id }}, '{{ $item->nisn }}', '{{ $item->nama }}', '{{ $item->kelas_id }}', '{{ $item->tahun_ajaran_id }}', '{{ $item->email_orang_tua }}')" class="text-blue-600 hover:text-blue-800 bg-blue-50 p-2 rounded-md transition-colors" title="Edit Data">
                             <i class="fa-solid fa-pen-to-square"></i>
                         </button>
                         <form action="{{ route('admin.siswa.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus data siswa ini?')">
@@ -55,7 +57,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="7" class="py-8 text-center text-gray-500">
+                    <td colspan="8" class="py-8 text-center text-gray-500">
                         <div class="flex flex-col items-center justify-center">
                             <i class="fa-solid fa-users-slash text-4xl text-gray-300 mb-3"></i>
                             <p>Belum ada data siswa terdaftar.</p>
@@ -92,6 +94,11 @@
                         <label for="nama" class="block text-sm font-semibold text-gray-700 mb-1">Nama Lengkap <span class="text-red-500">*</span></label>
                         <input type="text" name="nama" id="nama" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm" placeholder="Nama Siswa" required autocomplete="off">
                     </div>
+                </div>
+
+                <div>
+                    <label for="email_orang_tua" class="block text-sm font-semibold text-gray-700 mb-1">Email Orang Tua <span class="text-red-500">*</span></label>
+                    <input type="email" name="email_orang_tua" id="email_orang_tua" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm" placeholder="contoh@gmail.com" required autocomplete="off">
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -136,6 +143,7 @@
     // Deklarasi Input
     const inputNisn = document.getElementById('nisn');
     const inputNama = document.getElementById('nama');
+    const inputEmail = document.getElementById('email_orang_tua');
     const inputKelas = document.getElementById('kelas_id');
     const inputTahun = document.getElementById('tahun_ajaran_id');
 
@@ -152,7 +160,7 @@
         setTimeout(() => inputNisn.focus(), 100);
     }
     
-    function openModalEdit(id, nisn, nama, kelas_id, tahun_ajaran_id) {
+    function openModalEdit(id, nisn, nama, kelas_id, tahun_ajaran_id, email_orang_tua) {
         modal.classList.remove('hidden');
         
         form.action = `/admin/manajemen-siswa/siswa/${id}`;
@@ -161,6 +169,7 @@
         // Mengisi form dengan data lama
         inputNisn.value = nisn;
         inputNama.value = nama;
+        inputEmail.value = email_orang_tua === '-' ? '' : email_orang_tua;
         inputKelas.value = kelas_id;
         inputTahun.value = tahun_ajaran_id;
         

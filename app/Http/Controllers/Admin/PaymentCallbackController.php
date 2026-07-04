@@ -39,6 +39,15 @@ class PaymentCallbackController extends Controller
                 // Pembayaran Berhasil
                 $pembayaran->update(['status' => 'lunas']);
                 $tagihan->update(['status' => 'lunas']);
+
+                // Kirim email kuitansi
+                if (!empty($tagihan->siswa->email_orang_tua)) {
+                    try {
+                        \Illuminate\Support\Facades\Mail::to($tagihan->siswa->email_orang_tua)->send(new \App\Mail\PaymentSuccessMail($tagihan, $pembayaran));
+                    } catch (\Exception $e) {
+                        \Illuminate\Support\Facades\Log::error('Gagal mengirim email Lunas: ' . $e->getMessage());
+                    }
+                }
             } elseif ($transactionStatus == 'pending') {
                 // Menunggu Pembayaran
                 $pembayaran->update(['status' => 'menunggu']);
