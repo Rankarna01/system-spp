@@ -124,14 +124,15 @@
             <div class="bg-blue-50/50 border border-blue-100 rounded-2xl p-5 relative overflow-hidden">
                 <div class="absolute top-0 right-0 w-16 h-16 bg-blue-100 rounded-bl-full opacity-50"></div>
                 
-                <p class="text-xs font-bold text-blue-600 uppercase tracking-wider mb-2" id="ins-bank">BANK VIRTUAL ACCOUNT</p>
+                <p class="text-xs font-bold text-blue-600 uppercase tracking-wider mb-2 relative z-10" id="ins-bank">BANK VIRTUAL ACCOUNT</p>
                 
-                <div class="flex items-center justify-between gap-2">
-                    <p id="ins-va" class="text-2xl font-mono font-bold text-gray-800 tracking-widest">0000000000</p>
-                    <button onclick="copyVA()" class="bg-white border border-blue-200 text-blue-600 hover:bg-blue-600 hover:text-white h-10 w-10 rounded-xl flex items-center justify-center transition shadow-sm" title="Salin Nomor VA">
-                        <i id="copy-icon" class="fa-regular fa-copy"></i>
-                    </button>
+                <div class="mb-4 relative z-10">
+                    <p id="ins-va" class="text-2xl sm:text-3xl font-mono font-black text-gray-800 tracking-widest break-all">0000000000</p>
                 </div>
+                
+                <button onclick="copyVA()" class="w-full relative z-10 bg-white border border-blue-200 text-blue-600 hover:bg-blue-600 hover:text-white py-2.5 rounded-xl text-sm font-bold shadow-sm transition active:scale-95 flex items-center justify-center gap-2" title="Salin Nomor VA">
+                    <i id="copy-icon" class="fa-regular fa-copy"></i> <span id="copy-text">Salin Nomor VA</span>
+                </button>
             </div>
 
             <div>
@@ -197,11 +198,13 @@
     function copyVA() {
         // Ambil teks VA
         const vaNumber = txtVA.innerText;
+        const copyText = document.getElementById('copy-text');
         
         // Copy ke clipboard menggunakan API navigator modern
         navigator.clipboard.writeText(vaNumber).then(() => {
             // Ubah icon jadi centang
             copyIcon.className = "fa-solid fa-check";
+            copyText.innerText = "Tersalin!";
             
             // Tampilkan SweetAlert mini (Toast)
             Swal.fire({
@@ -217,6 +220,7 @@
             // Kembalikan icon setelah 2 detik
             setTimeout(() => {
                 copyIcon.className = "fa-regular fa-copy";
+                copyText.innerText = "Salin Nomor VA";
             }, 2000);
         }).catch(err => {
             console.error('Gagal menyalin teks: ', err);

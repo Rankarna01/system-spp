@@ -64,12 +64,9 @@
                             <button disabled class="text-gray-400 bg-gray-100 px-3 py-1.5 rounded-md text-xs font-bold cursor-not-allowed">Selesai</button>
                         
                         @elseif($t->status == 'menunggu' && $t->pembayaranAktif)
-                            <form action="{{ route('admin.pembayaran.cek_status', $t->pembayaranAktif->order_id) }}" method="POST" class="inline-block">
-                                @csrf
-                                <button type="submit" class="bg-white border border-primary text-primary hover:bg-primary hover:text-white px-3 py-1.5 rounded-md text-xs font-bold transition-colors">
-                                    <i class="fa-solid fa-rotate mr-1"></i> Cek Status
-                                </button>
-                            </form>
+                            <button disabled class="text-yellow-600 bg-yellow-50 px-3 py-1.5 rounded-md text-xs font-bold cursor-wait border border-yellow-200 shadow-sm transition-all">
+                                <i class="fa-solid fa-hourglass-half mr-1 animate-pulse"></i> Menunggu Bayar
+                            </button>
 
                         @else
                             <button onclick="openModalVA({{ $t->id }}, '{{ $t->siswa->nama }}', '{{ $t->bulan }}')" class="bg-secondary hover:bg-yellow-500 text-white px-3 py-1.5 rounded-md text-xs font-bold transition-colors shadow-sm">

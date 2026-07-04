@@ -43,7 +43,10 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
-// 2. Route Auth (Tamu)
+// 2. Route Callback Midtrans (Harus di luar auth agar bisa diakses oleh server Midtrans)
+Route::post('/payment-callback', [PaymentCallbackController::class, 'receive']);
+
+// 3. Route Auth (Tamu)
 Route::middleware(['guest'])->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login', [AuthController::class, 'processLogin']);
@@ -78,7 +81,6 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/generate-va/{tagihan_id}', [PembayaranController::class, 'generateVa'])->name('generate_va');
         });
 
-        Route::post('/payment-callback', [PaymentCallbackController::class, 'receive']); //callback langsung unutk nontifikasi bayar digunakan ketika sudah production
         Route::get('/riwayat-transaksi', [RiwayatController::class, 'index'])->name('riwayat.index');
         Route::post('/pembayaran/cek-status/{order_id}', [PembayaranController::class, 'cekStatusMidtrans'])->name('pembayaran.cek_status');
 
