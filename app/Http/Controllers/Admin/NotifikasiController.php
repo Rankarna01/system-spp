@@ -50,6 +50,23 @@ class NotifikasiController extends Controller
 
             Notifikasi::insert($dataInsert);
 
+            // Jika jenis notifikasi adalah reminder, kirim email blast juga
+            if ($request->jenis === 'reminder') {
+                foreach ($siswas as $siswa) {
+                    $dataSiswa = \App\Models\Siswa::where('nama', $siswa->name)->first();
+                    
+                    if ($dataSiswa && !empty($dataSiswa->email_orang_tua)) {
+                        try {
+                            \Illuminate\Support\Facades\Mail::to($dataSiswa->email_orang_tua)->send(
+                                new \App\Mail\ReminderBlastMail($request->judul, $request->pesan, $dataSiswa->nama)
+                            );
+                        } catch (\Exception $e) {
+                            \Illuminate\Support\Facades\Log::error('Gagal mengirim email reminder blast ke ' . $dataSiswa->email_orang_tua . ': ' . $e->getMessage());
+                        }
+                    }
+                }
+            }
+
             DB::commit();
             return back()->with('success', 'Berhasil mengirim notifikasi ke ' . count($siswas) . ' siswa!');
 
